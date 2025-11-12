@@ -1,0 +1,189 @@
+
+
+; ====================================================================================================
+; md.lib
+; Hardware definitions
+; Do not modify!!!
+
+; Rachel Harrison
+; 11/11/2025
+; ====================================================================================================
+
+; --------------------------------------------------
+; General/Assembler
+; --------------------------------------------------
+
+BYTE:					equ 0
+WORD:					equ 2
+LONG:					equ 4
+
+align:	macros
+	cnop	0,\1
+
+dseven:	macros
+		ds.w	0
+
+rseven:	macros
+	rs.b	__rs&1
+
+; --------------------------------------------------
+
+; --------------------------------------------------
+; 68k
+; --------------------------------------------------
+
+rom_start:				equ $000000
+rom_end:				equ $400000
+
+ram_start:				equ $FF0000
+ram_end:				equ $1000000
+
+sram_start:				equ $200000
+sram_end:				equ $210000
+
+ROM_LENGTH:				equ rom_end-rom_start
+RAM_LENGTH:				equ ram_end-ram_start
+SRAM_LENGTH:			equ sram_end-sram_start
+
+push:	macros
+		movem.l	d0-a6, -(sp)
+
+pop:	macros
+		movem.l	(sp)+, d0-a6
+
+; --------------------------------------------------
+
+; --------------------------------------------------
+; Z80
+; --------------------------------------------------
+
+z80_ram:				equ $A00000
+z80_end:				equ $A02000
+
+z80_busrequest:			equ $A11100
+z80_resetrequest:		equ $A11200
+
+Z80_LENGTH:				equ z80_end-z80_ram
+
+Z80_RELEASE:			equ 0
+Z80_ASSERT:				equ 1
+
+z80_buson:	macros
+		move.b	#Z80_ASSERT, z80_busrequest
+
+z80_busoff:	macros
+		move.b	#Z80_RELEASE, z80_busrequest
+
+z80_reseton:	macros
+		move.b	#Z80_RELEASE, z80_resetrequest
+
+z80_resetoff:	macros
+		move.b	#Z80_ASSERT, z80_resetrequest
+
+z80_wait:	macro
+@wait\@:
+		btst	#0, z80_busrequest
+		bne.s	@wait\@
+	endm
+
+; --------------------------------------------------
+
+; --------------------------------------------------
+; I/O
+; --------------------------------------------------
+
+io_systeminfo:			equ $A10001
+
+io_port1data:			equ $A10003
+io_port2data:			equ $A10005
+io_port1control:		equ $A10009
+io_port2control:		equ $A1000B
+
+io_sramflag:			equ $A130F1
+io_bankpage1:			equ $A130F3
+io_bankpage2:			equ $A130F5
+io_bankpage3:			equ $A130F7
+io_bankpage4:			equ $A130F9
+io_bankpage5:			equ $A130FB
+io_bankpage6:			equ $A130FD
+io_bankpage7:			equ $A130FF
+
+io_tmssstring:			equ $A14000
+
+; --------------------------------------------------
+
+; --------------------------------------------------
+; VDP
+; --------------------------------------------------
+
+vdp_data:				equ $C00000
+vdp_control:			equ $C00004
+vdp_hvcount:			equ $C00008
+
+TILE_LENGTH:			equ 32
+SPRITE_LENGTH:			equ 8
+VRAM_LENGTH:			equ $10000
+CRAM_LENGTH:			equ 64*WORD
+VSRAM_LENGTH:			equ 20*2*WORD
+SPRITETABLE_LENGTH:		equ 80*SPRITE_LENGTH
+HSCROLL_LENGTH:			equ 240*2*WORD
+
+vdpreg_mode1:			equ $8000
+vdpreg_mode2:			equ $8100
+vdpreg_planeavram:		equ $8200
+vdpreg_windowvram:		equ $8300
+vdpreg_planebvram:		equ $8400
+vdpreg_spritevram:		equ $8500
+vdpreg_bgcolor:			equ $8700
+vdpreg_hintrate:		equ $8A00
+vdpreg_mode3:			equ $8B00
+vdpreg_mode4:			equ $8C00
+vdpreg_hscrollvram:		equ $8D00
+vdpreg_autoinc:			equ $8F00
+vdpreg_planesize:		equ $9000
+vdpreg_windowx:			equ $9100
+vdpreg_windowy:			equ $9200
+vdpreg_dmalength:		equ $94009300
+vdpreg_dmasource:		equ $96009500
+vdpreg_dmacommand:		equ $9700
+
+VDPCOMMAND_VRAMREAD:	equ $00000000
+VDPCOMMAND_VRAMWRITE:	equ $40000000
+VDPCOMMAND_VRAMDMA:		equ $40000080
+VDPCOMMAND_CRAMREAD:	equ $00000020
+VDPCOMMAND_CRAMWRITE:	equ $C0000000
+VDPCOMMAND_CRAMDMA:		equ $C0000080
+VDPCOMMAND_VSRAMREAD:	equ $00000010
+VDPCOMMAND_VSRAMWRITE:	equ $40000010
+VDPCOMMAND_VSRAMDMA:	equ $40000090
+
+vdp_docommand:	macro	type, rwd, addr, ctrl
+	local cmd
+cmd:	equ ((\addr\&$3FFF)<<16)|((\addr\&$C000)>>14)|VDPCOMMAND_\type\\rwd
+	if narg>3
+		move.l	#\#cmd, \ctrl
+	else
+		move.l	#\#cmd, vdp_control
+	endif
+	endm
+
+; --------------------------------------------------
+
+; --------------------------------------------------
+; Sound
+; --------------------------------------------------
+
+ym_a0:					equ $A04000
+ym_d0:					equ $A04001
+ym_a1:					equ $A04002
+ym_d1:					equ $A04003
+
+psg_control:			equ $C00011
+
+; --------------------------------------------------
+
+; ====================================================================================================
+; End of file
+; ====================================================================================================
+
+	list

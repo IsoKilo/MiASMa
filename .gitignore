@@ -1,0 +1,6 @@
+*.gen
+*.obj
+*.sym
+*.lst
+*.map
+*.log
