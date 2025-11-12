@@ -41,13 +41,13 @@ int_init:
 		rts
 
 vint_sync:
-		move.w	sr, -(sp)			; Store status register on the stack.
-		move.w	#$2300, sr			; Enable interrupts.
+		move	sr, -(sp)			; Store status register on the stack.
+		move	#$2300, sr			; Enable interrupts.
 		move.l	vint_count, d0		; Fetch current interrupt count.
 @wait:
 		cmp.l	vint_count, d0		; Has the count changed yet?
 		beq.s	@wait				; If not, keep waiting until it triggers.
-		move.w	(sp)+, sr			; Restore the status register.
+		move	(sp)+, sr			; Restore the status register.
 		rts
 
 int_return:

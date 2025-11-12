@@ -9,10 +9,9 @@
 
 	section	.bss
 
-	xdef	engine_scene, engine_initflag
+	xdef	engine_scene
 
 engine_scene:			ds.l	1
-engine_initflag:		ds.b	1
 	dseven
 
 ; --------------------------------------------------
@@ -26,9 +25,6 @@ engine_initflag:		ds.b	1
 	xref	scene_example
 
 main:
-		tst.b	engine_initflag			; Has the console already been initialized?
-		bne.s	@softreset				; If so, skip full initialization.				
-		move.b	#1, engine_initflag		; Set flag for next time.
 		move.b	io_systeminfo, d0		; Get system info.
 		andi.b	#$F, d0					; Mask in only the version number.
 		beq.s	@notmss					; If it's version 0, skip TMSS.
@@ -55,7 +51,8 @@ main:
 		move.l	#scene_example, engine_scene
 
 main_loop:
-		jsr		engine_scene			; Run scene for this loop.
+		movea.l	engine_scene, a0
+		jsr		(a0)					; Run scene for this loop.
 		bra.s	main_loop				; Loop program forever.
 
 ; ====================================================================================================

@@ -44,6 +44,9 @@ scene_example:
 		vdp_docommand	CRAM, WRITE, $0062
 		move.w	#$0EE, vdp_data
 		move.w	#vdpreg_autoinc|2, vdp_control
+		move.w	#vdpreg_planesize|%000001, d0
+		move.w	d0, vdp_registercache+24
+		move.w	d0, vdp_control
 		move.w	#vdpreg_mode2|%01110100, d0
 		move.w	d0, vdp_registercache+2
 		move.w	d0, vdp_control
@@ -55,9 +58,9 @@ example_loop:
 
 example_string:
 		dc.b	"Hello, world!", STRING_NEWLINE
-		dc.b	STRING_PALETTE1, "Hello, world, but in red!", STRING_NEWLINE
-		dc.b	STRING_PALETTE2, "Hello, world, but in blue!", STRING_NEWLINE
-		dc.b	STRING_PALETTE3, "Hello, world, but in yellow!", STRING_END
+;		dc.b	STRING_PALETTE1, "Hello, world, but in red!", STRING_NEWLINE
+;		dc.b	STRING_PALETTE2, "Hello, world, but in blue!", STRING_NEWLINE
+;		dc.b	STRING_PALETTE3, "Hello, world, but in yellow!", STRING_END
 		even
 
 ; ====================================================================================================

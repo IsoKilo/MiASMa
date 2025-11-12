@@ -37,7 +37,7 @@ cpu_sp:					ds.w	1
 	xref	error_bus, error_address, error_illegal
 	xref	error_zerodivide, error_chk, error_trapv
 	xref	error_privilege, error_trace, error_line1010, error_line1111
-	xref	error_freeze
+	xref	error_misc
 
 header_vectors:
 		dc.l	cpu_sp&$FFFFFF
@@ -52,58 +52,58 @@ header_vectors:
 		dc.l	error_trace
 		dc.l	error_line1010
 		dc.l	error_line1111
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
 		dc.l	hint_jmp
-		dc.l	error_freeze
+		dc.l	error_misc
 		dc.l	vint_jmp
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
-		dc.l	error_freeze
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
+		dc.l	error_misc
 
 header_systemtype:
 		dc.b	"SEGA MEGA DRIVE "
