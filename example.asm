@@ -58,9 +58,9 @@ example_loop:
 
 example_string:
 		dc.b	"Hello, world!", STRING_NEWLINE
-;		dc.b	STRING_PALETTE1, "Hello, world, but in red!", STRING_NEWLINE
-;		dc.b	STRING_PALETTE2, "Hello, world, but in blue!", STRING_NEWLINE
-;		dc.b	STRING_PALETTE3, "Hello, world, but in yellow!", STRING_END
+		dc.b	STRING_PALETTE1, "Hello, world, but in red!", STRING_NEWLINE
+		dc.b	STRING_PALETTE2, "Hello, world, but in blue!", STRING_NEWLINE
+		dc.b	STRING_PALETTE3, "Hello, world, but in yellow!", STRING_END
 		even
 
 ; ====================================================================================================
