@@ -1,6 +1,6 @@
 ; ====================================================================================================
 ; vdp.asm
-; VPD functions
+; VDP hardware functions.
 
 ; Rachel Harrison
 ; 11/11/2025
@@ -13,10 +13,10 @@
 	section	.bss
 
 	xdef	vdp_registercache
-	xdef	vdp_palettebuffer
+
+	xref	pal_buffer1, pal_buffer2
 
 vdp_registercache:		ds.w 20						; VDP register cache. This is so we have a way of reading registers and syncing registers across the engine.
-vdp_palettebuffer:		ds.b CRAM_LENGTH			; Palette buffer, gets DMA'd into CRAM every V-int.
 	dseven
 
 ; --------------------------------------------------
@@ -25,7 +25,7 @@ vdp_palettebuffer:		ds.b CRAM_LENGTH			; Palette buffer, gets DMA'd into CRAM ev
 
 	xdef	vdp_registerinit
 	xdef	vdp_vramclear, vdp_cramclear, vdp_vsramclear
-	xdef	vdp_tileload, vdp_tilemapload, vdp_palload
+	xdef	vdp_tileload, vdp_tilemapload
 
 vdp_registerinit:
 		lea		register_table, a0
@@ -69,14 +69,16 @@ vdp_vramclear:
 ; Clears CRAM and palette variables.
 
 vdp_cramclear:
-		lea		vdp_palettebuffer, a0
+		lea		pal_buffer1, a0
+		lea		pal_buffer2, a1
 		vdp_docommand	CRAM, WRITE, $0000
 		moveq	#(CRAM_LENGTH/LONG)-1, d0			; Set loop count.
 		moveq	#0, d1
 
 @loop:
 		move.l	d1, vdp_data						; Clear CRAM data.
-		move.l	d1, (a0)+							; Clear palette buffer.
+		move.l	d1, (a0)							; Clear palette buffer.
+		move.l	d1, (a1)+
 		dbf		d0, @loop
 		rts
 
@@ -119,7 +121,7 @@ vdp_tileload:
 vdp_tilemapload:
 		lea		vdp_data, a1
 		move.w	vdp_registercache+24, d3			; Get plane size.
-		and.w	#3, d3								; Mask in plane width.
+		andi.w	#3, d3								; Mask in plane width.
 		asl.b	#2,d3								; * LONG
 		move.l	tilemap_rowlengths(pc,d3.w), d3		; Get corresponding row length.
 
@@ -139,22 +141,6 @@ tilemap_rowlengths:
 		dc.l	64*$20000
 		dc.l	0*$20000	; unused
 		dc.l	128*$20000
-
-; Loads palette data into palette buffer.
-
-; Input
-; d0.w - First colour*2
-; d1.w - # of colours-1
-; a0.l - Palette data
-
-vdp_palload:
-		lea		vdp_palettebuffer, a1
-		add.w	d0, a1								; Go to first colour.
-
-@loop:
-		move.w	(a0)+, (a1)+						; Write palette data to palette buffer.
-		dbf		d1, @loop
-		rts
 
 ; ====================================================================================================
 	end

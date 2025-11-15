@@ -1,6 +1,6 @@
 ; ====================================================================================================
 ; string.asm
-; String printing functions
+; String printing functions.
 
 ; Rachel Harrison
 ; 11/11/2025
@@ -57,7 +57,7 @@ string_fontload:
 
 string_draw:
 		move.w	vdp_registercache+24, d3			; Get plane size.
-		and.w	#3, d3								; Mask in plane width.
+		andi.w	#3, d3								; Mask in plane width.
 		asl.b	#2,d3								; * LONG
 		move.l	newline_rowlengths(pc,d3.w), d3		; Get corresponding row length.
 		move.l	d0, vdp_control						; Do initial VRAM write command.
@@ -66,7 +66,7 @@ string_draw:
 string_loop:
 		move.b	(a0)+, d1							; Get next character.
 		bmi.s	@code								; If it's negative, then this is a character code.
-		sub.b	#" ", d1							; Subtract base character (space)
+		subi.b	#" ", d1							; Subtract base character (space)
 		move.w	d1, vdp_data						; Write tile data to VDP.
 		bra.s	string_loop							; Loop until an end character is hit.
 
@@ -80,10 +80,10 @@ string_loop:
 		jmp		code_table(pc,d2.w)
 
 newline_rowlengths:
-		dc.l	32*$20000
-		dc.l	64*$20000
-		dc.l	0*$20000	; unused
-		dc.l	128*$20000
+		dc.l	(((32*LONG)&$3FFF)<<16)|(((32*LONG)&$C000)>>14)
+		dc.l	(((64*LONG)&$3FFF)<<16)|(((64*LONG)&$C000)>>14)
+		dc.l	0									; Unused.
+		dc.l	(((128*LONG)&$3FFF)<<16)|(((128*LONG)&$C000)>>14)
 
 code_table:
 		dc.w	code_newline-code_table

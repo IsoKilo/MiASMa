@@ -147,6 +147,10 @@ vdpreg_dmalength:		equ $94009300
 vdpreg_dmasource:		equ $96009500
 vdpreg_dmacommand:		equ $9700
 
+DMA_TRANSFER:			equ $00
+DMA_FILL:				equ $80
+DMA_COPY:				equ $C0
+
 VDPCOMMAND_VRAMREAD:	equ $00000000
 VDPCOMMAND_VRAMWRITE:	equ $40000000
 VDPCOMMAND_VRAMDMA:		equ $40000080
@@ -157,13 +161,65 @@ VDPCOMMAND_VSRAMREAD:	equ $00000010
 VDPCOMMAND_VSRAMWRITE:	equ $40000010
 VDPCOMMAND_VSRAMDMA:	equ $40000090
 
-vdp_docommand:	macro	type, rwd, addr, ctrl
+vdp_docommand:	macro	type, rwd, dest, ctrl
 	local cmd
-cmd:	equ ((\addr\&$3FFF)<<16)|((\addr\&$C000)>>14)|VDPCOMMAND_\type\\rwd
+cmd:	equ ((\dest\&$3FFF)<<16)|((\dest\&$C000)>>14)|VDPCOMMAND_\type\\rwd
 	if narg>3
 		move.l	#\#cmd, \ctrl
 	else
 		move.l	#\#cmd, vdp_control
+	endif
+	endm
+
+dma_dotransfer:	macro	type, src, dest, len, ctrl
+	local cmd
+cmd:	equ ((\dest\&$3FFF)<<16)|((\dest\&$C000)>>14)|VDPCOMMAND_\type\DMA
+	if	narg<5
+		move.l	#vdpreg_dmalength|(((\len\>>1)&$FF00)<<8)|((\len\>>1)&$FF), vdp_control			; Set DMA length.
+		move.l	#vdpreg_dmasource|(((\src\>>1)&$FF00)<<8)|((\src\>>1)&$FF), vdp_control			; Set DMA source.
+		move.w	#vdpreg_dmacommand|DMA_TRANSFER|((((\src\>>1)&$FF0000)>>16)&$7F), vdp_control	; Set DMA type to transfer and upper byte of source.
+		move.w	#(\#cmd\>>16), vdp_control														; Write upper word of DMA command.
+		move.w	#(\#cmd\&$FFFF), -(sp)															; Store lower word on stack to get around bug.
+		move.w	(sp)+, vdp_control																; Execute DMA.
+	else 
+		move.l	#vdpreg_dmalength|(((\len\>>1)&$FF00)<<8)|((\len\>>1)&$FF), \ctrl				; Set DMA length.
+		move.l	#vdpreg_dmasource|(((\src\>>1)&$FF00)<<8)|((\src\>>1)&$FF), \ctrl				; Set DMA source.
+		move.w	#vdpreg_dmacommand|DMA_TRANSFER|((((\src\>>1)&$FF0000)>>16)&$7F), \ctrl			; Set DMA type and upper byte of source.
+		move.w	#(\#cmd\>>16), \ctrl															; Write upper word of DMA command.
+		move.w	#(\#cmd&$FFFF), -(sp)															; Store lower word on stack to get around bug.
+		move.w	(sp)+, \ctrl																	; Execute DMA.
+	endif
+	endm
+
+dma_dofill:		macro	byte, dest, len, ctrl
+	if	narg<4
+		move.w	#vdpreg_autoinc|1, vdp_control													; DMA fill does word transfers.
+		move.l	#vdpreg_dmalength|(((\len\-1)&$FF00)<<8)|((\len\-1)&$FF), vdp_control			; Set DMA length.
+		move.w	#vdpreg_dmacommand|DMA_FILL, vdp_control										; Set DMA type to fill.
+		vdp_docommand	VRAM, DMA, \dest														; Execute DMA.
+		move.w	#\byte\|(\byte\<<8), vdp_data													; Fill VRAM with byte.
+@wait\@:
+		btst	#1, vdp_control																	; Is the DMA still occuring?
+		bne.s	@wait\@																			; If so, wait until it's donw.
+		move.w	vdp_registercache+22, vdp_control												; Make sure to xref vdp_registercache before using this macro.
+	else
+		move.w	#vdpreg_autoinc|1, \ctrl														; DMA fill does word transfers.
+		move.l	#vdpreg_dmalength|(((\len\-1)&$FF00)<<8)|((\len\-1)&$FF), \ctrl					; Set DMA length.
+		move.w	#vdpreg_dmacommand|DMA_FILL, \ctrl												; Set DMA type to fill.
+		vdp_docommand	VRAM, DMA, \dest, \ctrl													; Execute DMA.
+		move.w	#\byte\|(\byte\<<8), -4\ctrl													; Fill VRAM with byte.
+@wait\@:
+		btst	#1, \ctrl																		; Is the DMA still occuring?
+		bne.s	@wait\@																			; If so, wait until it's donw.
+		move.w	vdp_registercache+22, \ctrl														; Make sure to xref vdp_registercache before using this macro.
+	endif
+	endm
+
+dma_docopy:		macro	src, dest, len, ctrl
+	if	narg<4
+		vdp_docommand	VRAM, DMA, \dest
+	else
+		vdp_docommand	VRAM, DMA, \dest, \ctrl
 	endif
 	endm
 

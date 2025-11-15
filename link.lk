@@ -4,11 +4,15 @@ bss		group	org($FF0000),bss
 	section .text,text
 	section .data,text
 	section .bss,bss
-	
-	include "obj\header.obj" ; Header must come first, do not place any objects before this.
-	include	"obj\main.obj"
-	include	"obj\int.obj"
-	include	"obj\vdp.obj"
-	include	"obj\string.obj"
-	include	"obj\error.obj"
-	include	"obj\example.obj"
+
+; Engine
+	include "obj\header.obj"	; Motorola 68000 vector table and SEGA Mega Drive ROM header. - MUST COME FIRST
+	include	"obj\main.obj"		; Program entry and main loop.
+	include	"obj\int.obj"		; Interrupt functions.
+	include	"obj\vdp.obj"		; VDP hardware functions.
+	include	"obj\pal.obj"		; Palette management.
+	include	"obj\string.obj"	; String printing functions.
+	include	"obj\error.obj"		; Error handler.
+
+; Game
+	include	"obj\example.obj"	; Example scene.
