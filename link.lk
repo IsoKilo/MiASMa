@@ -1,18 +1,12 @@
 text	group	org($000000)
 bss		group	org($FF0000),bss
 
-	section .text,text
-	section .data,text
-	section .bss,bss
+	section	code,text
+	section ram,bss
 
-; Engine
-	include "obj\header.obj"	; Motorola 68000 vector table and SEGA Mega Drive ROM header. - MUST COME FIRST
-	include	"obj\main.obj"		; Program entry and main loop.
-	include	"obj\int.obj"		; Interrupt functions.
-	include	"obj\vdp.obj"		; VDP hardware functions.
-	include	"obj\pal.obj"		; Palette management.
-	include	"obj\string.obj"	; String printing functions.
-	include	"obj\error.obj"		; Error handler.
-
-; Game
-	include	"obj\example.obj"	; Example scene.
+	include	"obj\header.obj"
+	include	"obj\main.obj"
+	include	"obj\error.obj"
+	include	"obj\ints.obj"
+	include	"obj\vdp.obj"
+	include	"obj\string.obj"

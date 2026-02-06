@@ -28,6 +28,18 @@
 			"args": [
 				"clean"
 			]
-		}
+		},
+    	{
+    	  "label": "Run in Emulator",
+    	  "type": "shell",
+    	  "command": "make run",
+    	  "group": "build"
+    	},
+    	{
+    	  "label": "Flash to Mega EverDrive X7",
+    	  "type": "shell",
+    	  "command": "make flash",
+    	  "group": "build"
+    	}
 	]
 }
