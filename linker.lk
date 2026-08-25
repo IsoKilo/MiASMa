@@ -1,0 +1,13 @@
+text	group	org($000000)
+bss		group	org($FF0000),bss
+
+	section	.header,text		; ROM header.
+	section	.text,text			; Game code.
+	section	.data,text			; Game data.
+	section	.bss,bss			; RAM.
+
+	; Engine objects
+	include	"obj/header.obj"	; 68k exception vectors and Mega Drive ROM header. MUST COME FIRST!!!
+	include	"obj/main.obj"		; Main program entry and engine loop.
+	include	"obj/vdp.obj"		; VDP related functions and variables.
+	include	"obj/string.obj"	; String rendering functions.

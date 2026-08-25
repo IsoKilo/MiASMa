@@ -1,7 +1,10 @@
-*.gen
-*.obj
-*.sym
+# Output directories
+obj/
+out/
+
+# Output files
 *.lst
+*.sym
 *.map
 *.log
-template.s
+*.gen
